@@ -73,8 +73,8 @@ instance Show Expr where
   show (If0 a b c) = "(if0 "++show a++" "++show b++" "++show c++")"
   show (Fold a b c) = "(fold "++show a++" "++show b++" (lambda(y z) ("++show c++"))"
   show (TFold a) = "(fold "++show X++" "++show Zero++" (lambda("++show X++"y) ("++show a++"))"
-  show (Op1 a b) = show a++" "++show b
-  show (Op2 a b c) = show a++" "++show b++" "++show c
+  show (Op1 a b) = "("++show a++" "++show b++")"
+  show (Op2 a b c) = "("++show a++" "++show b++" "++show c++")"
 
 data Operations = OOp1 Op1
                 | OOp2 Op2
