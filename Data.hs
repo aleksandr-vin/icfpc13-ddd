@@ -41,12 +41,12 @@ instance Show Param where
   show Open = "?"
   show Zero = "0"
   show One = "1"
-  show X = "X"
+  show X = "x"
 
 instance Show Param' where
   show (Param a) = show a
-  show Y = "Y"  
-  show Z = "Z"  
+  show Y = "y"  
+  show Z = "z"  
   
 instance Show Op1 where
   show Not = "not"
@@ -64,17 +64,17 @@ instance Show Op2 where
 instance Show Expr' where
   show (P' a) = show a
   show (If0' a b c) = "(if0 "++show a++" "++show b++" "++show c++")"
-  show (Op1' a b) = show a++" "++show b
-  show (Op2' a b c) = show a++" "++show b++" "++show c
+  show (Op1' a b) = "("++show a++" "++show b++")"
+  show (Op2' a b c) = "("++show a++" "++show b++" "++show c++")"
     
   
 instance Show Expr where
   show (P a) = show a
   show (If0 a b c) = "(if0 "++show a++" "++show b++" "++show c++")"
-  show (Fold a b c) = "(fold "++show a++" "++show b++" (lambda(y z) ("++show c++"))"
-  show (TFold a) = "(fold "++show X++" "++show Zero++" (lambda("++show X++"y) ("++show a++"))"
-  show (Op1 a b) = show a++" "++show b
-  show (Op2 a b c) = show a++" "++show b++" "++show c
+  show (Fold a b c) = "(fold "++show a++" "++show b++" (lambda (y z) "++show c++"))"
+  show (TFold a) = "(fold "++show X++" "++show Zero++" (lambda ("++show X++"y) "++show a++"))"
+  show (Op1 a b) = "("++show a++" "++show b++")"
+  show (Op2 a b c) = "("++show a++" "++show b++" "++show c++")"
 
 data Operations = OOp1 Op1
                 | OOp2 Op2
