@@ -1,6 +1,8 @@
 
 
 import DataTests
+import GenTests
 
 run =
-    DataTests.testIt
+    do DataTests.testIt
+       GenTests.testIt
