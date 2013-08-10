@@ -3,11 +3,16 @@
 module Gen
 ( gen
 , testIt
+, fooGen
+, fooSizer
 ) where
 
 import Data
 import Test.HUnit
 import Data.List
+
+-- import Debug.Trace
+trace _ = id
 
 gen :: Int -> [Operations] -> Expr
 gen size ops =
@@ -15,20 +20,28 @@ gen size ops =
 
 -- Для отладки алгоритма перебора
 fooGen :: (Char -> Int) -> Int -> String -> [String]
-fooGen _ 0 _ = []
-fooGen sizer n o = (foldl (\acc x -> [x]:(addHead x) ++ acc) [] o)
-       where addHead x = (map (x:) (fooGen (sizer) (n - (sizer x)) o))
+fooGen sizer n o
+    | n == 0    = [""] -- [""]  при отладке меняем на ["+"]
+    | otherwise = foldl yyy [] $ filter (\x -> 0 <= (decrN x)) o
+    where yyy acc x =
+              trace (";; acc = " ++ show acc ++ " x = " ++ show x) $
+                        (addHead x) ++ acc
+          addHead x =
+              map (x:) $ trace (";;; xxx = " ++ show xxx)
+                  xxx
+              where xxx = fooGen (sizer) (decrN x) o
+          decrN x = n - (sizer x)
 
 -- Оценщик операции
 sizer OFold = 2
 sizer OTFold = 2
 sizer _ = 1
 
-fooGenF n o =
-        filter ((n==) . length) $ fooGen (fooSizer) n o
-
 fooSizer :: Char -> Int
-fooSizer n = 1
+fooSizer n
+         | n == 'a'  = 1
+         | otherwise = 1
+               
 
 -- Tests
 
@@ -42,7 +55,7 @@ test1 = TestCase (assertEqual "fooGenF"
                      ,"bba"
                      ,"bbb"
                      ])
-      (Data.List.sort (fooGenF 3 "ab")))
+      (Data.List.sort (fooGen (fooSizer) 3 "ab")))
 
 tests = TestList [ TestLabel "test1" test1
                  ]
