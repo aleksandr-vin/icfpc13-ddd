@@ -2,7 +2,9 @@
 
 import Data
 import Gen
-import qualified Data.List as L
+import Opener
 
 
 run n o = genP (n-1) $ readOps o
+
+orun n o = openP $ run n o
