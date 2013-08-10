@@ -8,6 +8,7 @@ module Data
 , Op1(..)
 , Op2(..)
 , Operations(..)
+, Prog(..)
 , readOps
 ) where
 
@@ -76,6 +77,12 @@ instance Show Expr where
   show (TFold a) = "(fold "++show X++" "++show Zero++" (lambda ("++show X++" y) "++show a++"))"
   show (Op1 a b) = "("++show a++" "++show b++")"
   show (Op2 a b c) = "("++show a++" "++show b++" "++show c++")"
+
+data Prog = Prog Expr
+            deriving (Eq)
+
+instance Show Prog where
+    show (Prog e) = "(lambda (x) " ++ show e ++ ")"
 
 data Operations = OOp1 Op1
                 | OOp2 Op2
