@@ -1,1 +1,1 @@
-[{"solutions":["(lambda (x) (shr4 (shr4 (shr4 (shr4 (shr4 0))))))","(lambda (x) (shr4 (shr4 (shr4 (shr4 (shr4 1))))))","(lambda (x) (shr4 (shr4 (shr4 (shr4 (shr4 x))))))"]}]
+[{"solutions":["(lambda (x) (shr4 0))","(lambda (x) (shr4 1))","(lambda (x) (shr4 x))"]}]
