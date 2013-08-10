@@ -14,10 +14,10 @@ module Data
 
 
 data Param = Open | Zero | One | X
-     deriving (Eq)
+     deriving (Eq, Ord)
 
 data Param' = Param Param | Y | Z
-     deriving (Eq)
+     deriving (Eq, Ord)
 
 data Expr = P Param
           | If0 Expr Expr Expr
@@ -25,19 +25,19 @@ data Expr = P Param
           | TFold Expr'
           | Op1 Op1 Expr
           | Op2 Op2 Expr Expr
-     deriving (Eq)
+     deriving (Eq, Ord)
 
 data Expr' = P' Param'
            | If0' Expr' Expr' Expr'
            | Op1' Op1 Expr'
            | Op2' Op2 Expr' Expr'
-     deriving (Eq)
+     deriving (Eq, Ord)
 
 data Op1 = Not | Shl1 | Shr1 | Shr4 | Shr16
-     deriving (Eq)
+     deriving (Eq, Ord)
 
 data Op2 = And | Or | Xor | Plus
-     deriving (Eq)
+     deriving (Eq, Ord)
 
 instance Show Param where
   show Open = "?"
@@ -89,7 +89,7 @@ data Operations = OOp1 Op1
                 | OIf0
                 | OFold
                 | OTFold
-     deriving (Eq, Show)
+     deriving (Eq)
 
 instance Read Operations where
          readsPrec _ "not" = [(OOp1 Not, "")]
@@ -104,6 +104,13 @@ instance Read Operations where
          readsPrec _ "if0" = [(OIf0, "")]
          readsPrec _ "fold" = [(OFold, "")]
          readsPrec _ "tfold" = [(OTFold, "")]
+
+instance Show Operations where
+    show (OOp1 o)  = show o
+    show (OOp2 o)  = show o
+    show (OIf0)   = "if0"
+    show (OFold)  = "fold"
+    show (OTFold) = "tfold"
 
 readOps :: [String] -> [Operations]
 readOps = map read
