@@ -1,0 +1,1 @@
+[{"solutions":["(lambda (x) (shr1 (shr1 (shr1 (shr1 (shr1 0))))))","(lambda (x) (shr1 (shr1 (shr1 (shr1 (shr1 1))))))","(lambda (x) (shr1 (shr1 (shr1 (shr1 (shr1 x))))))"]}]
