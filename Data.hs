@@ -8,6 +8,7 @@ module Data
 , Op1(..)
 , Op2(..)
 , Operations(..)
+, readOps
 ) where
 
 
@@ -98,3 +99,5 @@ instance Read Operations where
          readsPrec _ "fold" = [(OFold, "")]
          readsPrec _ "tfold" = [(OTFold, "")]
 
+readOps :: [String] -> [Operations]
+readOps = map read
