@@ -4,10 +4,6 @@ module Gen
 ( genP
 , gen
 , testIt
-, fooGen
-, fooSizer
-, cons1
-, cons2
 ) where
 
 import Data
@@ -17,11 +13,17 @@ import Data.List
 --import Debug.Trace
 trace _ = id
 
+filterExps o exs = filter (\p -> opsInProg (remapTFold o) p) exs
+    where opsInProg o p = all (\x -> isInfixOf x (show p)) o
+          remapTFold o = map (\x -> if x == "tfold" then "fold" else x) o
+
+gen n o = filterExps (map (show) o) $ genE n o
+
 genP :: Int -> [Operations] -> [Prog]
 genP n o = map (Prog) $ gen n o
 
-gen :: Int -> [Operations] -> [Expr]
-gen n o
+genE :: Int -> [Operations] -> [Expr]
+genE n o
     | n == 1    = [P Open]
     | otherwise = foldl yyy [] $ filter (\x -> 0 <= (decrN x)) o
     where yyy acc x = (addHead x) ++ acc
@@ -32,8 +34,8 @@ gen n o
                     zzz (OTFold) = consTFold (TFold) (decrN x) (filter (/= OTFold) o)
           decrN x = n - (sizer x)
 
-gen' :: Int -> [Operations] -> [Expr']
-gen' n o
+genE' :: Int -> [Operations] -> [Expr']
+genE' n o
     | n == 1    = [P' (Param Open)]
     | otherwise = trace (";; +") $ foldl yyy [] $ filter (\x -> 0 <= (decrN x)) o
     where yyy acc x = (addHead x) ++ acc
@@ -69,18 +71,18 @@ fooSizer n
 
 -- коннектор для унарных операций
 --cons1 :: Op1 -> [Expr] -> [Expr]
-consTFold op n o = map op $ gen' n o
+consTFold op n o = map op $ genE' n o
 
-cons1 op n o = map op $ gen n o
+cons1 op n o = map op $ genE n o
 
 cons2 op n o = foldl (\acc (e1,e2) -> (mix e1 e2) ++ acc) [] plants
-    where plants = [((gen i o), (gen (n-i) o)) | i <- [1..n `div` 2]] 
+    where plants = [((genE i o), (genE (n-i) o)) | i <- [1..n `div` 2]] 
           mix e1 e2 = foldl (\acc e2x -> (map (\e1x -> op e1x e2x) e1) ++ acc) [] e2
 
-cons1' op n o = map op $ gen' n o
+cons1' op n o = map op $ genE' n o
 
 cons2' op n o = foldl (\acc (e1,e2) -> (mix e1 e2) ++ acc) [] plants
-    where plants = [((gen' i o), (gen' (n-i) o)) | i <- [1..n `div` 2]] 
+    where plants = [((genE' i o), (genE' (n-i) o)) | i <- [1..n `div` 2]] 
           mix e1 e2 = foldl (\acc e2x -> (map (\e1x -> op e1x e2x) e1) ++ acc) [] e2
 
 -- Tests
