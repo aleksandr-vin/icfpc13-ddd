@@ -74,7 +74,7 @@ instance Show Expr where
   show (P a) = show a
   show (If0 a b c) = "(if0 "++show a++" "++show b++" "++show c++")"
   show (Fold a b c) = "(fold "++show a++" "++show b++" (lambda (y z) "++show c++"))"
-  show (TFold a) = "(fold "++show X++" "++show Zero++" (lambda ("++show X++" y) "++show a++"))"
+  show (TFold a) = "(fold "++show X++" "++show Zero++" (lambda ("++show Y++" "++show Z++") "++show a++"))"
   show (Op1 a b) = "("++show a++" "++show b++")"
   show (Op2 a b c) = "("++show a++" "++show b++" "++show c++")"
 
@@ -82,7 +82,7 @@ data Prog = Prog Expr
             deriving (Eq)
 
 instance Show Prog where
-    show (Prog e) = "(lambda (x) " ++ show e ++ ")"
+    show (Prog e) = "\"(lambda (x) " ++ show e ++ ")\"\n"
 
 data Operations = OOp1 Op1
                 | OOp2 Op2
