@@ -6,7 +6,9 @@ module Opener
 ) where
 
 import Data
+import Data.List
 
+open = nub . openExprs
 
 -- Открывает параметры в Prog
 openP :: [Prog] -> [Prog]
@@ -14,8 +16,8 @@ openP progs =
     map (Prog) . open $ map (unProg) progs
         where unProg (Prog e) = e
 
-open :: [Expr] -> [Expr]
-open exs = concat $ map (openExpr) exs
+openExprs :: [Expr] -> [Expr]
+openExprs exs = concat $ map (openExpr) exs
 
 openExpr :: Expr -> [Expr]
 openExpr (Op1 op e) = map (op1Comb op) $ openExpr e
@@ -36,21 +38,23 @@ openExpr' (P' (Param Open)) = [(P' (Param Zero))
                               ,(P' Y)
                               ,(P' Z)]
 
------------------------
+--------------------------------------------------
+--------------------------------------------------
+-- Оптимизации Expr
+
+--------------------------------------------------
 -- Оптимизации Op1
 
--- Оптимизация Not
+-- Оптимизация Op1 Not
 op1Comb Not (P Zero) = (P One)
 op1Comb Not (P One)  = (P Zero)
-op1Comb Not e = (Op1 Not e)
+ -- остальные Op1 не оптимизируются
+op1Comb op e = (Op1 op e)
 
--- НЕ СДЕЛАНА!!!
-op1Comb' Not e = (Op1' Not e)
-
------------------------
+--------------------------------------------------
 -- Оптимизации Op2
 
--- Оптимизация And
+-- Оптимизация Op2 And
 op2Comb And (P Zero) _        = (P Zero)
 op2Comb And (P One)  (P X)    = (Op2 And (P One) (P X))
 op2Comb And (P One)  e        = e
@@ -58,8 +62,50 @@ op2Comb And (P X)    (P Zero) = (P Zero)
 op2Comb And (P X)    (P One)  = op2Comb And (P One) (P X)
 op2Comb And (P X)    (P X)    = (P X)
 
-op2Comb' o e1 e2 = (Op2' o e1 e2)
+-- Оптимизация Op2' Or
 
------------------------
+-- Оптимизация Op2' Xor
+
+-- Оптимизация Op2' Plus
+
+op2Comb o e1 e2 = (Op2 o (min e1 e2) (max e1 e2))
+
+--------------------------------------------------
 -- Оптимизации TFold
 tfoldComb e = (TFold e)
+
+
+
+--------------------------------------------------
+--------------------------------------------------
+-- Оптимизации Expr'
+
+--------------------------------------------------
+-- Оптимизации Op1'
+
+-- Оптимизация Op1' Not
+op1Comb' Not (P' (Param Zero)) = (P' (Param One))
+op1Comb' Not (P' (Param One))  = (P' (Param Zero))
+ -- остальные Op1' не оптимизируются
+op1Comb' op e = (Op1' op e)
+
+--------------------------------------------------
+-- Оптимизации Op2'
+
+-- Оптимизация Op2' And
+op2Comb' And (P' (Param Zero)) _                 = (P' (Param Zero))
+op2Comb' And (P' (Param One))  (P' (Param X))    = (Op2' And (P' (Param One)) (P' (Param X)))
+op2Comb' And (P' (Param One))  e                 = e
+op2Comb' And (P' p)            (P' (Param Zero)) = (P' (Param Zero))
+op2Comb' And (P' p)            (P' (Param One))  = op2Comb' And (P' (Param One)) (P' p)
+op2Comb' And (P' p1)           (P' p2)
+             | p1 == p2  = (P' p1)
+             | otherwise = (Op2' And (P' (min p1 p2)) (P' (max p1 p2)))
+
+-- Оптимизация Op2' Or
+
+-- Оптимизация Op2' Xor
+
+-- Оптимизация Op2' Plus
+
+op2Comb' o e1 e2 = (Op2' o (min e1 e2) (max e1 e2))
