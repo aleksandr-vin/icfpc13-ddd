@@ -82,7 +82,9 @@ data Prog = Prog Expr
             deriving (Eq)
 
 instance Show Prog where
-    show (Prog e) = "\"(lambda (x) " ++ show e ++ ")\"\n"
+    show (Prog e) = "(lambda (x) " ++ show e ++ ")"
+
+data Json name 
 
 data Operations = OOp1 Op1
                 | OOp2 Op2
