@@ -81,7 +81,7 @@ op2Comb Or (P Zero) e         = e
 op2Comb Or (P One)  (P Zero)  = (P One)
 op2Comb Or (P One)  (P One)   = (P One)
 op2Comb Or (P One)  e         = (Op2 Or (min (P One) e) (max (P One) e))
-op2Comb Or _        (P Zero)  = (P Zero)
+op2Comb Or e        (P Zero)  = e
 op2Comb Or e        (P One)   = op2Comb Or (P One) e
 op2Comb Or e1       e2            
   | e1 == e2 = e1
@@ -156,7 +156,7 @@ op2Comb' Or (P' (Param One))  (P' (Param Zero))   = (P' (Param One))
 op2Comb' Or (P' (Param One))  (P' (Param One))    = (P' (Param One))
 op2Comb' Or (P' (Param One))  e                   = (Op2' Or (min (P' (Param One)) e)
                                                      (max (P' (Param One)) e))
-op2Comb' Or _                 (P' (Param Zero))   = (P' (Param Zero))
+op2Comb' Or e                 (P' (Param Zero))   = e
 op2Comb' Or e                 (P' (Param One))    = op2Comb' Or (P' (Param One)) e
 op2Comb' Or e1                e2                  
   | e1 == e2 = e1
