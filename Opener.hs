@@ -88,6 +88,19 @@ op2Comb Or e1       e2
   | otherwise = (Op2 Or (min e1 e2) (max e1 e2))
 
 -- Оптимизация Op2 Xor
+op2Comb Xor (P Zero) (P Zero)  = (P Zero)         -- xor 0 0 = 0
+op2Comb Xor (P Zero) (P One)   = (P One)          -- xor 0 1 = 1
+op2Comb Xor (P Zero) e         = e                -- xor 0 e = e
+
+op2Comb Xor (P One)  (P Zero)  = (P One)          -- xor 1 0 = 1
+op2Comb Xor (P One)  (P One)   = (P Zero)         -- xor 1 1 = 0
+op2Comb Xor (P One)  e         = (Op2 Xor (min (P One) e) (max (P One) e))
+op2Comb Xor e        (P Zero)  = e
+op2Comb Xor e        (P One)   = op2Comb Xor (P One) e
+op2Comb Xor e1       e2                             
+  | e1 == e2 = (P Zero)                           -- xor x x = 0 
+  | otherwise = (Op2 Xor (min e1 e2) (max e1 e2))
+
 
 -- Оптимизация Op2 Plus
 op2Comb Plus (P Zero) (P Zero) = (P Zero)
@@ -105,7 +118,7 @@ op2Comb Plus e1       e2
   | otherwise = (Op2 Plus (min e1 e2) (max e1 e2))
 
 -- остальные Op2 не оптимизируются
-op2Comb o e1 e2 = (Op2 o (min e1 e2) (max e1 e2))
+--op2Comb o e1 e2 = (Op2 o (min e1 e2) (max e1 e2))
 
 --------------------------------------------------
 -- Оптимизации TFold
@@ -163,6 +176,19 @@ op2Comb' Or e1                e2
   | otherwise = (Op2' Or (min e1 e2) (max e1 e2))
 
 -- Оптимизация Op2' Xor
+op2Comb' Xor (P' (Param Zero)) (P' (Param Zero))  = (P' (Param Zero))         -- xor 0 0 = 0
+op2Comb' Xor (P' (Param Zero)) (P' (Param One))   = (P' (Param One))          -- xor 0 1 = 1
+op2Comb' Xor (P' (Param Zero)) e                  = e                         -- xor 0 e = e
+
+op2Comb' Xor (P' (Param One))  (P' (Param Zero))  = (P' (Param One))          -- xor 1 0 = 1
+op2Comb' Xor (P' (Param One))  (P' (Param One))   = (P' (Param Zero))         -- xor 1 1 = 0
+op2Comb' Xor (P' (Param One))  e                  = (Op2' Xor (min (P' (Param One)) e) (max (P' (Param One)) e))
+op2Comb' Xor e                 (P' (Param Zero))  = e
+op2Comb' Xor e                 (P' (Param One))   = op2Comb' Xor (P' (Param One)) e
+op2Comb' Xor e1       e2                             
+  | e1 == e2 = (P' (Param Zero))                                              -- xor x x = 0 
+  | otherwise = (Op2' Xor (min e1 e2) (max e1 e2))
+
 
 -- Оптимизация Op2' Plus
 op2Comb' Plus (P' (Param Zero)) (P' (Param Zero)) = (P' (Param Zero))
@@ -180,4 +206,4 @@ op2Comb' Plus e1                e2
   | otherwise = (Op2' Plus (min e1 e2) (max e1 e2))
 
 -- остальные Op2' не оптимизируются
-op2Comb' o e1 e2 = (Op2' o (min e1 e2) (max e1 e2))
+--op2Comb' o e1 e2 = (Op2' o (min e1 e2) (max e1 e2))
