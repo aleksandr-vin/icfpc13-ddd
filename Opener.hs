@@ -48,7 +48,8 @@ openExpr' (P' (Param Open)) = [(P' (Param Zero))
 -- Оптимизация Op1 Not
 op1Comb Not (P Zero) = (P One)
 op1Comb Not (P One)  = (P Zero)
- -- остальные Op1 не оптимизируются
+
+-- остальные Op1 не оптимизируются
 op1Comb op e = (Op1 op e)
 
 --------------------------------------------------
@@ -62,11 +63,21 @@ op2Comb And (P X)    (P Zero) = (P Zero)
 op2Comb And (P X)    (P One)  = op2Comb And (P One) (P X)
 op2Comb And (P X)    (P X)    = (P X)
 
--- Оптимизация Op2' Or
+-- Оптимизация Op2 Or
+op2Comb Or (P Zero) (P Zero)  = (P Zero)
+op2Comb Or (P Zero) (P One)   = (P One)
+op2Comb Or (P Zero) (P X)     = (P X)
+op2Comb Or (P One)  (P Zero)  = (P One)
+op2Comb Or (P One)  (P One)   = (P One)
+op2Comb Or (P One)  (P X)     = (P X)
+op2Comb Or (P X)    (P Zero)  = (P Zero)
+op2Comb Or (P X)    (P One)   = (P X)
+op2Comb Or (P X)    (P X)     = (P X)
 
--- Оптимизация Op2' Xor
 
--- Оптимизация Op2' Plus
+-- Оптимизация Op2 Xor
+
+-- Оптимизация Op2 Plus
 
 op2Comb o e1 e2 = (Op2 o (min e1 e2) (max e1 e2))
 
@@ -99,10 +110,21 @@ op2Comb' And (P' (Param One))  e                 = e
 op2Comb' And (P' p)            (P' (Param Zero)) = (P' (Param Zero))
 op2Comb' And (P' p)            (P' (Param One))  = op2Comb' And (P' (Param One)) (P' p)
 op2Comb' And (P' p1)           (P' p2)
-             | p1 == p2  = (P' p1)
-             | otherwise = (Op2' And (P' (min p1 p2)) (P' (max p1 p2)))
+  | p1 == p2  = (P' p1)
+  | otherwise = (Op2' And (P' (min p1 p2)) (P' (max p1 p2)))
 
 -- Оптимизация Op2' Or
+op2Comb' Or (P' (Param Zero)) (P' (Param Zero))   = (P' (Param Zero))
+op2Comb' Or (P' (Param Zero)) (P' (Param One))    = (P' (Param One))
+op2Comb' Or (P' (Param Zero)) e                   = e
+op2Comb' Or (P' (Param One))  (P' (Param Zero))   = (P' (Param One))
+op2Comb' Or (P' (Param One))  (P' (Param One))    = (P' (Param One))
+op2Comb' Or (P' (Param One))  e                   = e
+op2Comb' Or e                 (P' (Param Zero))   = (P' (Param Zero))
+op2Comb' Or e                 (P' (Param One))    = (P' (Param X))
+op2Comb' Or e1                e2                  
+  | e1 == e2 = e1
+  | otherwise = (Op2' Or (min e1 e2) (max e1 e2))
 
 -- Оптимизация Op2' Xor
 
