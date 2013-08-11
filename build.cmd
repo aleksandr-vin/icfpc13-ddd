@@ -1,0 +1,1 @@
+ghc -O run.hs
