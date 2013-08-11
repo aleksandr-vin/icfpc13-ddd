@@ -29,6 +29,10 @@ openExpr (If0 e1 e2 e3) =
   let ops_e1 = map (if0Comb) $ openExpr e1
       ops_e2 = concat $ map (\op_e1 -> map (op_e1) $ openExpr e2) ops_e1
   in concat $ map (\op_e2 -> map (op_e2) $ openExpr e3) ops_e2
+openExpr (Fold e1 e2 e3) =
+  let ops_e1 = map (foldComb) $ openExpr e1
+      ops_e2 = concat $ map (\op_e1 -> map (op_e1) $ openExpr e2) ops_e1
+  in concat $ map (\op_e2 -> map (op_e2) $ openExpr' e3) ops_e2
 openExpr (P Open) = [(P Zero), (P One), (P X)]
 openExpr e = [e]
 
@@ -154,6 +158,10 @@ op2Comb Plus e1       e2
 
 if0Comb (P Zero) e2 e3 = e2
 if0Comb e1 e2 e3 = (If0 e1 e2 e3)
+
+--------------------------------------------------
+-- Оптимизации Fold                  
+foldComb e1 e2 e3 = (Fold e1 e2 e3)
 
 --------------------------------------------------
 -- Оптимизации TFold
