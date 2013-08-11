@@ -151,6 +151,11 @@ test23 = TestCase (assertEqual ""
                   [0,1,2,3,4,0x5,0x6,0x0ff,0xFFFFFFFFffffffff])
   where foo = compile (Prog (Op2 Plus (P X) (P X)))
 
+test24 = TestCase (assertEqual ""
+                  [0,0,0,0,0,0x0000000000000011,0x00000000000000ff]
+                  $ map (foo)
+                  [0,1,2,3,4,0x1122334455667788,0xFFFFFFFFffffffff])
+  where foo = compile (Prog (TFold (P' Y)))
 
 tests = TestList [TestLabel "test1" test1
                  ,TestLabel "test2" test2
@@ -175,6 +180,7 @@ tests = TestList [TestLabel "test1" test1
                  ,TestLabel "test21" test21
                  ,TestLabel "test22" test22
                  ,TestLabel "test23" test23
+                 ,TestLabel "test24" test24
                  ]
 
 play = do testIt
