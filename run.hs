@@ -64,4 +64,4 @@ toJson (p, r, x) n o =
             ,toJSObject [("operators", map (JSString . toJSString . show) o)]
             ]
 
-hex n = ("0x"++) $ showIntAtBase 16 intToDigit n ""
+hex n = ("0x"++) $ map (toUpper) $ showIntAtBase 16 intToDigit n ""
