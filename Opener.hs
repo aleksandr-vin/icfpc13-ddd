@@ -83,7 +83,11 @@ op2Comb o e1 e2 = (Op2 o (min e1 e2) (max e1 e2))
 
 --------------------------------------------------
 -- Оптимизации TFold
-tfoldComb e = (TFold e)
+tfoldComb (P' (Param Zero)) = (P Zero)
+tfoldComb (P' (Param One))  = (P One)
+tfoldComb (P' (Param X))    = (P X)
+tfoldComb (P' Z)            = (P Zero)
+tfoldComb e                 = (TFold e)
 
 
 
