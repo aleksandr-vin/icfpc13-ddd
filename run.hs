@@ -8,6 +8,8 @@ import Text.JSON
 import System.IO
 import System.Environment
 import Data.Word
+import Numeric
+import Data.Char
 
 -- sample input
 sss = "[{\"inputs\":[\"0\",\"1\",\"2\"]},{\"size\":[\"3\"]},{\"operators\":[\"not\"]}]"
@@ -43,7 +45,7 @@ main = do
   s <- readFile inf
   writeFile outf (foo s) -- decode s :: Result [JSObject JSValue])
   
-foo x = toJson (crun xs n o)
+foo x = toJson (crun xs n o) n o
   where objs = decode x :: Result [JSObject JSValue]
         din = (\(Ok x) -> x) $ getInputs objs
         xs = map (\x -> read x :: Word64) $ inputs din
@@ -54,7 +56,12 @@ json progs =
     encode $ [toJSObject [(name, map (JSString . toJSString . show) progs)]]
     where name = "solutions"
 
-toJson (p, r, x) =
-  encode $ [toJSObject [("solutions", map (JSString . toJSString . show) p)],
-            toJSObject [("results",   map (JSString . toJSString . show) r)],
-            toJSObject [("inputs",    map (JSString . toJSString . show) x)]]
+toJson (p, r, x) n o =
+  encode $ [toJSObject [("solutions",  map (JSString . toJSString . show) p)]
+            ,toJSObject [("results",   map (JSArray . map (JSString . toJSString . hex)) r)]
+            ,toJSObject [("inputs",    map (JSString . toJSString . show) x)]
+            ,toJSObject [("size",      map (JSString . toJSString . show) [n])]
+            ,toJSObject [("operators", map (JSString . toJSString . show) o)]
+            ]
+
+hex n = ("0x"++) $ showIntAtBase 16 intToDigit n ""
