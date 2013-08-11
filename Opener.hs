@@ -26,6 +26,7 @@ openExpr (Op2 op e1 e2) =
     in concat $ map (\op_e1 -> map (op_e1) $ openExpr e2) ops_e1
 openExpr (TFold e) = map (tfoldComb) $ openExpr' e
 openExpr (P Open) = [(P Zero), (P One), (P X)]
+openExpr e = [e]
 
 openExpr' :: Expr' -> [Expr']
 openExpr' (Op1' op e) = map (op1Comb' op) $ openExpr' e
@@ -37,6 +38,7 @@ openExpr' (P' (Param Open)) = [(P' (Param Zero))
                               ,(P' (Param X))
                               ,(P' Y)
                               ,(P' Z)]
+openExpr' e = [e]                              
 
 -- Заменяет шаблонный eT на eN в e
 subsExp' :: Expr' -> Expr' -> Expr' -> Expr'
@@ -63,22 +65,27 @@ op1Comb op e = (Op1 op e)
 
 -- Оптимизация Op2 And
 op2Comb And (P Zero) _        = (P Zero)
-op2Comb And (P One)  (P X)    = (Op2 And (P One) (P X))
-op2Comb And (P One)  e        = e
-op2Comb And (P X)    (P Zero) = (P Zero)
-op2Comb And (P X)    (P One)  = op2Comb And (P One) (P X)
-op2Comb And (P X)    (P X)    = (P X)
+op2Comb And (P One)  (P Zero) = (P Zero)
+op2Comb And (P One)  (P One)  = (P One)
+op2Comb And (P One)  e        = (Op2 And (min (P One) e) (max (P One) e))
+op2Comb And _        (P Zero) = (P Zero)
+op2Comb And e        (P One)  = op2Comb And (P One) e
+op2Comb And e1       e2
+  | e1 == e2 = e1
+  | otherwise = (Op2 And (min e1 e2) (max e1 e2))
 
 -- Оптимизация Op2 Or
 op2Comb Or (P Zero) (P Zero)  = (P Zero)
 op2Comb Or (P Zero) (P One)   = (P One)
-op2Comb Or (P Zero) (P X)     = (P X)
+op2Comb Or (P Zero) e         = e
 op2Comb Or (P One)  (P Zero)  = (P One)
 op2Comb Or (P One)  (P One)   = (P One)
-op2Comb Or (P One)  (P X)     = (P X)
-op2Comb Or (P X)    (P Zero)  = (P Zero)
-op2Comb Or (P X)    (P One)   = (P X)
-op2Comb Or (P X)    (P X)     = (P X)
+op2Comb Or (P One)  e         = e
+op2Comb Or _        (P Zero)  = (P Zero)
+op2Comb Or e        (P One)   = e
+op2Comb Or e1       e2            
+  | e1 == e2 = e1
+  | otherwise = (Op2 Or (min e1 e2) (max e1 e2))
 
 
 -- Оптимизация Op2 Xor
@@ -118,13 +125,15 @@ op1Comb' op e = (Op1' op e)
 
 -- Оптимизация Op2' And
 op2Comb' And (P' (Param Zero)) _                 = (P' (Param Zero))
-op2Comb' And (P' (Param One))  (P' (Param X))    = (Op2' And (P' (Param One)) (P' (Param X)))
-op2Comb' And (P' (Param One))  e                 = e
-op2Comb' And (P' p)            (P' (Param Zero)) = (P' (Param Zero))
-op2Comb' And (P' p)            (P' (Param One))  = op2Comb' And (P' (Param One)) (P' p)
-op2Comb' And (P' p1)           (P' p2)
-  | p1 == p2  = (P' p1)
-  | otherwise = (Op2' And (P' (min p1 p2)) (P' (max p1 p2)))
+op2Comb' And (P' (Param One))  (P' (Param Zero)) = (P' (Param Zero))
+op2Comb' And (P' (Param One))  (P' (Param One))  = (P' (Param One))
+op2Comb' And (P' (Param One))  e                 = (Op2' And (min (P' (Param One)) e)
+                                                    (max (P' (Param One)) e))
+op2Comb' And _                 (P' (Param Zero)) = (P' (Param Zero))
+op2Comb' And e                 (P' (Param One))  = op2Comb' And (P' (Param One)) e
+op2Comb' And e1                e2
+  | e1 == e2  = e1
+  | otherwise = (Op2' And (min e1 e2) (max e1 e2))
 
 -- Оптимизация Op2' Or
 op2Comb' Or (P' (Param Zero)) (P' (Param Zero))   = (P' (Param Zero))
@@ -133,8 +142,8 @@ op2Comb' Or (P' (Param Zero)) e                   = e
 op2Comb' Or (P' (Param One))  (P' (Param Zero))   = (P' (Param One))
 op2Comb' Or (P' (Param One))  (P' (Param One))    = (P' (Param One))
 op2Comb' Or (P' (Param One))  e                   = e
-op2Comb' Or e                 (P' (Param Zero))   = (P' (Param Zero))
-op2Comb' Or e                 (P' (Param One))    = (P' (Param X))
+op2Comb' Or _                 (P' (Param Zero))   = (P' (Param Zero))
+op2Comb' Or e                 (P' (Param One))    = e
 op2Comb' Or e1                e2                  
   | e1 == e2 = e1
   | otherwise = (Op2' Or (min e1 e2) (max e1 e2))
