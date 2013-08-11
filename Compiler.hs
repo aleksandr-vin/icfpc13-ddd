@@ -24,6 +24,8 @@ compileExp (P One)   = (\x -> 1)
 compileExp (P X)     = (\x -> x)
 compileExp (Op1 o e) = (\x -> op1 o (compileExp e x))
 compileExp (Op2 o e1 e2) = (\x -> op2 o (compileExp e1 x) (compileExp e2 x))
+compileExp (If0 e1 e2 e3) = (\x -> if0 (compileExp e1 x) (compileExp e2 x) (compileExp e3 x))
+--compileExp (Fold e1 e2 e3) = (\x -> fold (compileExp e1 x) (compileExp e2 x) (compileExp' e3 x) x)
 compileExp (TFold e)     = (\x -> tfold (compileExp' e) x)
 
 --                          lambda (y        z        x)
@@ -35,6 +37,7 @@ compileExp' (P' Y)            = (\y z x -> y)
 compileExp' (P' Z)            = (\y z x -> z)
 compileExp' (Op1' o e)        = (\y z x -> op1 o (compileExp' e  y z x))
 compileExp' (Op2' o e1 e2)    = (\y z x -> op2 o (compileExp' e1 y z x) (compileExp' e2 y z x))
+compileExp' (If0' e1 e2 e3)   = (\y z x -> if0'  (compileExp' e1 y z x) (compileExp' e2 y z x) (compileExp' e3 y z x))
 
 op1 :: Op1 -> VType -> VType
 op1 Not f = xor basis f
@@ -48,6 +51,14 @@ op2 And f1 f2 = (.&.) f1 f2
 op2 Or f1 f2 = (.|.) f1 f2
 op2 Xor f1 f2 = xor f1 f2
 op2 Plus f1 f2 = (+) f1 f2
+
+if0 f1 f2 f3 = if f1 == 0
+               then f2
+               else f3
+                    
+if0' f1 f2 f3 = if f1 == 0
+                then f2
+                else f3
 
 -- (fold e1       e2   (lambda  (y        z        x)          ) )   (x)
 fold :: VType -> VType     -> (VType -> VType -> VType -> VType) -> VType -> VType
