@@ -61,7 +61,7 @@ toJson (p, r, x) n o =
             ,toJSObject [("results",   map (JSArray . map (JSString . toJSString . hex)) r)]
             ,toJSObject [("inputs",    map (JSString . toJSString . show) x)]
             ,toJSObject [("size",      map (JSString . toJSString . show) [n])]
-            ,toJSObject [("operators", map (JSString . toJSString . show) o)]
+            ,toJSObject [("operators", map (JSString . toJSString) o)]
             ]
 
 hex n = ("0x"++) $ map (toUpper) $ showIntAtBase 16 intToDigit n ""
