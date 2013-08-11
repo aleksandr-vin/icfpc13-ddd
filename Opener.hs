@@ -57,6 +57,27 @@ subsExp' eT eN e
 
 -- Оптимизация Op1 Not
 op1Comb Not (Op1 Not e) = e
+
+-- Оптимизация Op1 Shr16
+op1Comb Shr16 (P Zero) = (P Zero)
+op1Comb Shr16 (P One) = (P Zero)
+op1Comb Shr16 (Op1 Shr16 (Op1 Shr16 (Op1 Shr16 e))) = (P Zero)
+
+
+-- Оптимизация Op1 Shr4
+op1Comb Shr4 (P Zero) = (P Zero)
+op1Comb Shr4 (P One) = (P Zero)
+op1Comb Shr4 (Op1 Shr4 (Op1 Shr4 (Op1 Shr4 e))) = (Op1 Shr16 e)
+
+-- Оптимизация Op1 Shr1
+op1Comb Shr1 (P Zero) = (P Zero)
+op1Comb Shr1 (P One) = (P Zero)
+op1Comb Shr1 (Op1 Shr1 (Op1 Shr1 (Op1 Shr1 e))) = (Op1 Shr4 e)
+
+-- Оптимизация Op1 Shl1
+op1Comb Shl1 (P Zero) = (P One)
+op1Comb Shl1 (Op1 Shl1 (Op1 Shl1 (Op1 Shl1 (Op1 Shl1 (Op1 Shl1 (Op1 Shl1 (Op1 Shl1 (Op1 Shl1 (Op1 Shl1 (Op1 Shl1 (Op1 Shl1 (Op1 Shl1 (Op1 Shl1 (Op1 Shl1 (Op1 Shl1 e))))))))))))))) = (P Zero)
+
 -- остальные Op1 не оптимизируются
 op1Comb op e = (Op1 op e)
 
@@ -143,6 +164,26 @@ tfoldComb e = let assumption = subsExp' (P' Z) (P' (Param Zero)) e
 
 -- Оптимизация Op1' Not
 op1Comb' Not (Op1' Not e) = e
+
+-- Оптимизация Op1' Shr16
+op1Comb' Shr16 (P' (Param Zero)) = (P' (Param Zero))
+op1Comb' Shr16 (P' (Param One)) = (P' (Param Zero))
+op1Comb' Shr16 (Op1' Shr16 (Op1' Shr16 (Op1' Shr16 e))) = (P' (Param Zero))
+
+-- Оптимизация Op1' Shr4
+op1Comb' Shr4 (P' (Param Zero)) = (P' (Param Zero))
+op1Comb' Shr4 (P' (Param One)) = (P' (Param Zero))
+op1Comb' Shr4 (Op1' Shr4 (Op1' Shr4 (Op1' Shr4 e))) = (Op1' Shr16 e)
+
+-- Оптимизация Op1' Shr1
+op1Comb' Shr1 (P' (Param Zero)) = (P' (Param Zero))
+op1Comb' Shr1 (P' (Param One)) = (P' (Param Zero))
+op1Comb' Shr1 (Op1' Shr1 (Op1' Shr1 (Op1' Shr1 e))) = (Op1' Shr4 e)
+
+-- Оптимизация Op1' Shl1
+op1Comb' Shl1 (P' (Param Zero)) = (P' (Param One))
+op1Comb' Shl1 (Op1' Shl1 (Op1' Shl1 (Op1' Shl1 (Op1' Shl1 (Op1' Shl1 (Op1' Shl1 (Op1' Shl1 (Op1' Shl1 (Op1' Shl1 (Op1' Shl1 (Op1' Shl1 (Op1' Shl1 (Op1' Shl1 (Op1' Shl1 (Op1' Shl1 e))))))))))))))) = (P' (Param Zero))
+
 -- остальные Op1' не оптимизируются
 op1Comb' op e = (Op1' op e)
 
