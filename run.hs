@@ -59,7 +59,7 @@ json progs =
 toJson (p, r, x) n o =
   encode $ [toJSObject [("solutions",  map (JSString . toJSString . show) p)]
             ,toJSObject [("results",   map (JSArray . map (JSString . toJSString . hex)) r)]
-            ,toJSObject [("inputs",    map (JSString . toJSString . show) x)]
+            ,toJSObject [("inputs",    map (JSString . toJSString . hex) x)]
             ,toJSObject [("size",      map (JSString . toJSString . show) [n])]
             ,toJSObject [("operators", map (JSString . toJSString) o)]
             ]
