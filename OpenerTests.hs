@@ -55,11 +55,11 @@ testAnd'1 = TestCase (assertEqual "open [(Op2 And (Op1 Not (P X)) (Op1 Not (P X)
                   $ open [(TFold (Op2' And (P' (Param Zero)) (Op1' Not (P' Y))))])
             
 testOr1 = TestCase (assertEqual "open [(Op2 Or (P One) (Op1 Not (P X)))]"
-                  [(Op1 Not (P X))]
+                  [(Op2 Or (P One) (Op1 Not (P X)))]
                   $ open [(Op2 Or (P One) (Op1 Not (P X)))])
         
 testOr'1 = TestCase (assertEqual "open [(Op2 Or (Op1 Not (P X)) (Op1 Not (P X)))]"
-                  [(TFold (Op1' Not (P' Y)))]
+                  [(TFold (Op2' Or (P' (Param One)) (Op1' Not (P' Y))))]
                   $ open [(TFold (Op2' Or (P' (Param One)) (Op1' Not (P' Y))))])            
 
 testPlus = TestCase (assertEqual "open [..(Op2 Plus)..]"
