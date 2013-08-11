@@ -34,5 +34,6 @@ tests = TestList [TestLabel "test1" test1
                  ,TestLabel "test4" test4
                  ]
 
-testIt = do runTestTT tests
-            G.testIt
+testIt = do G.testIt
+            runTestTT tests
+            
