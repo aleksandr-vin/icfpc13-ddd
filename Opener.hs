@@ -54,9 +54,7 @@ subsExp' eT eN e
 -- Оптимизации Op1
 
 -- Оптимизация Op1 Not
-op1Comb Not (P Zero) = (P One)
-op1Comb Not (P One)  = (P Zero)
-
+op1Comb Not (Op1 Not e) = e
 -- остальные Op1 не оптимизируются
 op1Comb op e = (Op1 op e)
 
@@ -111,9 +109,8 @@ tfoldComb e = let assumption = subsExp' (P' Z) (P' (Param Zero)) e
 -- Оптимизации Op1'
 
 -- Оптимизация Op1' Not
-op1Comb' Not (P' (Param Zero)) = (P' (Param One))
-op1Comb' Not (P' (Param One))  = (P' (Param Zero))
- -- остальные Op1' не оптимизируются
+op1Comb' Not (Op1' Not e) = e
+-- остальные Op1' не оптимизируются
 op1Comb' op e = (Op1' op e)
 
 --------------------------------------------------
