@@ -25,6 +25,10 @@ openExpr (Op2 op e1 e2) =
     let ops_e1 = map (op2Comb op) $ openExpr e1
     in concat $ map (\op_e1 -> map (op_e1) $ openExpr e2) ops_e1
 openExpr (TFold e) = map (tfoldComb) $ openExpr' e
+openExpr (If0 e1 e2 e3) =
+  let ops_e1 = map (if0Comb) $ openExpr e1
+      ops_e2 = concat $ map (\op_e1 -> map (op_e1) $ openExpr e2) ops_e1
+  in concat $ map (\op_e2 -> map (op_e2) $ openExpr e3) ops_e2
 openExpr (P Open) = [(P Zero), (P One), (P X)]
 openExpr e = [e]
 
@@ -33,6 +37,10 @@ openExpr' (Op1' op e) = map (op1Comb' op) $ openExpr' e
 openExpr' (Op2' op e1 e2) =
     let ops_e1 = map (op2Comb' op) $ openExpr' e1
     in concat $ map (\op_e1 -> map (op_e1) $ openExpr' e2) ops_e1
+openExpr' (If0' e1 e2 e3) =
+  let ops_e1 = map (if0Comb') $ openExpr' e1
+      ops_e2 = concat $ map (\op_e1 -> map (op_e1) $ openExpr' e2) ops_e1
+  in concat $ map (\op_e2 -> map (op_e2) $ openExpr' e3) ops_e2
 openExpr' (P' (Param Open)) = [(P' (Param Zero))
                               ,(P' (Param One))
                               ,(P' (Param X))
@@ -142,6 +150,12 @@ op2Comb Plus e1       e2
 --op2Comb o e1 e2 = (Op2 o (min e1 e2) (max e1 e2))
 
 --------------------------------------------------
+-- Оптимизации If0
+
+if0Comb (P Zero) e2 e3 = e2
+if0Comb e1 e2 e3 = (If0 e1 e2 e3)
+
+--------------------------------------------------
 -- Оптимизации TFold
 tfoldComb (P' (Param Zero)) = (P Zero)
 tfoldComb (P' (Param One))  = (P One)
@@ -248,3 +262,9 @@ op2Comb' Plus e1                e2
 
 -- остальные Op2' не оптимизируются
 --op2Comb' o e1 e2 = (Op2' o (min e1 e2) (max e1 e2))
+
+--------------------------------------------------
+-- Оптимизации If0'
+
+if0Comb' (P' (Param Zero)) e2 e3 = e2
+if0Comb' e1 e2 e3 = (If0' e1 e2 e3)
