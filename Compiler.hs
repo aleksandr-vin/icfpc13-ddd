@@ -25,7 +25,7 @@ compileExp (P X)     = (\x -> x)
 compileExp (Op1 o e) = (\x -> op1 o (compileExp e x))
 compileExp (Op2 o e1 e2) = (\x -> op2 o (compileExp e1 x) (compileExp e2 x))
 compileExp (If0 e1 e2 e3) = (\x -> if0 (compileExp e1 x) (compileExp e2 x) (compileExp e3 x))
---compileExp (Fold e1 e2 e3) = (\x -> fold (compileExp e1 x) (compileExp e2 x) (compileExp' e3 x) x)
+compileExp (Fold e1 e2 e3) = (\x -> fold (compileExp e1 x) (compileExp e2 x) (\y z x -> (compileExp' e3 y z x)) x)
 compileExp (TFold e)     = (\x -> tfold (compileExp' e) x)
 
 --                          lambda (y        z        x)
