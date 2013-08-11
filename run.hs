@@ -58,10 +58,12 @@ json progs =
 
 toJson (p, r, x) n o =
   encode $ [toJSObject [("solutions",  map (JSString . toJSString . show) p)]
-            ,toJSObject [("results",   map (JSArray . map (JSString . toJSString . hex)) r)]
+            ,toJSObject [("results",   map (JSArray  . map (JSString . toJSString . hex)) r)]
             ,toJSObject [("inputs",    map (JSString . toJSString . hex) x)]
             ,toJSObject [("size",      map (JSString . toJSString . show) [n])]
             ,toJSObject [("operators", map (JSString . toJSString) o)]
             ]
 
-hex n = ("0x"++) $ map (toUpper) $ showIntAtBase 16 intToDigit n ""
+hex n = ("0x"++) $ buf0 ++ map (toUpper) digits
+        where digits = showIntAtBase 16 intToDigit n ""
+              buf0 = take (16 - (length digits)) $ repeat '0'
