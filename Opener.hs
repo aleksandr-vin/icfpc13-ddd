@@ -38,6 +38,14 @@ openExpr' (P' (Param Open)) = [(P' (Param Zero))
                               ,(P' Y)
                               ,(P' Z)]
 
+-- Заменяет шаблонный eT на eN в e
+subsExp' :: Expr' -> Expr' -> Expr' -> Expr'
+subsExp' eT eN (Op1' op e) = op1Comb' op $ subsExp' eT eN e
+subsExp' eT eN (Op2' op e1 e2) = op2Comb' op (subsExp' eT eN e1) $ subsExp' eT eN e2
+subsExp' eT eN e
+  | e == eT = eN
+  | otherwise = e
+
 --------------------------------------------------
 --------------------------------------------------
 -- Оптимизации Expr
@@ -87,7 +95,11 @@ tfoldComb (P' (Param Zero)) = (P Zero)
 tfoldComb (P' (Param One))  = (P One)
 tfoldComb (P' (Param X))    = (P X)
 tfoldComb (P' Z)            = (P Zero)
-tfoldComb e                 = (TFold e)
+-- Оптимизации TFold second-level
+tfoldComb e = let assumption = subsExp' (P' Z) (P' (Param Zero)) e
+              in if assumption == (P' (Param Zero))
+              then (P Zero)
+              else (TFold e)
 
 
 
