@@ -87,11 +87,24 @@ op2Comb Or e1       e2
   | e1 == e2 = e1
   | otherwise = (Op2 Or (min e1 e2) (max e1 e2))
 
-
 -- Оптимизация Op2 Xor
 
 -- Оптимизация Op2 Plus
+op2Comb Plus (P Zero) (P Zero) = (P Zero)
+op2Comb Plus (P Zero) (P One)  = (P One)
+op2Comb Plus (P Zero) e        = e
+op2Comb Plus (P One)  (P Zero) = (P One)
+op2Comb Plus (P One)  (P One)  = (Op1 Shl1 (P One)) -- Уменьшаем цену 3->2
+op2Comb Plus (P One)  e        = (Op2 Plus
+                                  (min (P One) e)
+                                  (max (P One) e))
+op2Comb Plus e        (P Zero) = e
+op2Comb Plus e        (P One)  = op2Comb Plus (P One) e
+op2Comb Plus e1       e2
+  | e1 == e2 = op1Comb Shl1 e1 -- М.б. там будут ещё опт. в завис. от e1
+  | otherwise = (Op2 Plus (min e1 e2) (max e1 e2))
 
+-- остальные Op2 не оптимизируются
 op2Comb o e1 e2 = (Op2 o (min e1 e2) (max e1 e2))
 
 --------------------------------------------------
@@ -151,5 +164,19 @@ op2Comb' Or e1                e2
 -- Оптимизация Op2' Xor
 
 -- Оптимизация Op2' Plus
+op2Comb' Plus (P' (Param Zero)) (P' (Param Zero)) = (P' (Param Zero))
+op2Comb' Plus (P' (Param Zero)) (P' (Param One))  = (P' (Param One))
+op2Comb' Plus (P' (Param Zero)) e                 = e
+op2Comb' Plus (P' (Param One))  (P' (Param Zero)) = (P' (Param One))
+op2Comb' Plus (P' (Param One))  (P' (Param One))  = (Op1' Shl1 (P' (Param One))) -- Уменьшаем цену 3->2
+op2Comb' Plus (P' (Param One))  e                 = (Op2' Plus
+                                                     (min (P' (Param One)) e)
+                                                     (max (P' (Param One)) e))
+op2Comb' Plus e                 (P' (Param Zero)) = e
+op2Comb' Plus e                 (P' (Param One))  = op2Comb' Plus (P' (Param One)) e
+op2Comb' Plus e1                e2
+  | e1 == e2 = op1Comb' Shl1 e1 -- М.б. там будут ещё опт. в завис. от e1
+  | otherwise = (Op2' Plus (min e1 e2) (max e1 e2))
 
+-- остальные Op2' не оптимизируются
 op2Comb' o e1 e2 = (Op2' o (min e1 e2) (max e1 e2))
