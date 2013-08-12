@@ -115,6 +115,26 @@ testPlus'2 = TestCase (assertEqual "open [..(Op2' Plus)..] part3"
                   ,(TFold (Op2' Plus (Op1' Not (P' Y)) (Op1' Not (P' Y))))
                   ,(TFold (Op2' Plus (P' Y) (Op1' Not (P' Y))))
                   ])
+             
+testIf0 = TestCase (assertEqual "open [if0]"
+                  (sort $ nub
+                   [(If0 (P Zero) (P Zero) (P Zero))
+                   ,(If0 (P Zero) (P Zero) (P One))
+                   ,(If0 (P Zero) (P Zero) (P X))
+                    -- TODO
+                   ])
+                  $ sort $ open
+                  [(If0 (P Open) (P Open) (P Open))
+                  ])
+         
+testIf0' = TestCase (assertEqual "open [if0']"
+                  (sort $ nub
+                   [(TFold (If0' (P' (Param Zero)) (P' (Param Zero)) (P' (Param Zero))))
+                    -- TODO
+                   ])
+                  $ sort $ open
+                  [(TFold (If0' (P' (Param Open)) (P' (Param Open)) (P' (Param Open))))
+                  ])
 
 
 tests = TestList [TestLabel "test1" test1
@@ -131,6 +151,8 @@ tests = TestList [TestLabel "test1" test1
                  ,TestLabel "testPlus'" testPlus'
                  ,TestLabel "testPlus'1" testPlus'1
                  ,TestLabel "testPlus'2" testPlus'2
+                 ,TestLabel "testIf0" testIf0
+                 ,TestLabel "testIf0'" testIf0'
                  ]
 
 testIt = runTestTT tests
