@@ -134,6 +134,13 @@ op2Comb Plus (P One)  e        = (Op2 Plus
                                   (max (P One) e))
 op2Comb Plus e        (P Zero) = e
 op2Comb Plus e        (P One)  = op2Comb Plus (P One) e
+op2Comb Plus e1 (Op2 Plus e2 e3)
+  | e1 == e2  = (Op2 Plus 
+                  (min e3 (Op1 Shl1 (e1)))
+                  (max e3 (Op1 Shl1 (e1)))
+                )
+
+
 op2Comb Plus e1       e2
   | e1 == e2 = op1Comb Shl1 e1 -- М.б. там будут ещё опт. в завис. от e1
   | otherwise = (Op2 Plus (min e1 e2) (max e1 e2))
